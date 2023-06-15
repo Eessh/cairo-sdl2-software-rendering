@@ -1,0 +1,170 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+			"file_exclude_patterns": []
+		}
+	],
+	"settings": {
+		"tab_size": 2,
+		"font_face": "JetBrains Mono",
+		"font_size": 12,
+		"caret_extra_top": 3,
+		"caret_extra_bottom": 5,
+		"caret_extra_width": 1,
+	},
+	"build_systems": [
+		{
+			"name": "Project Build System",
+			"working_dir": "$folder",
+			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+			"variants": [
+				{
+					"name": "⚙️ Generate Makefiles using Premake5",
+					"windows": {
+						"shell_cmd": ".\\scripts\\windows\\gen_makefiles.bat"
+					},
+					"osx": {
+						"shell_cmd": "premake5 --cc=gcc gmake2"
+					},
+					"linux": {
+						"shell_cmd": "premake5 --cc=gcc gmake2"
+					}
+				},
+				// {
+				// 	"name": "🔨 Build: 🪲 Debug",
+				// 	"windows": {
+				// 		"shell_cmd": "start .\\scripts\\windows\\build_debug.bat"
+				// 	},
+				// 	"osx": {
+				// 		"shell_cmd": "make config=debug"
+				// 	},
+				// 	"linux": {
+				// 		"shell_cmd": "make config=debug"
+				// 	}
+				// },
+				// {
+				// 	"name": "🔨 Build: 🚀 Release",
+				// 	"windows": {
+				// 		"shell_cmd": "start .\\scripts\\windows\\build_release.bat"
+				// 	},
+				// 	"osx": {
+				// 		"shell_cmd": "make config=release"
+				// 	},
+				// 	"linux": {
+				// 		"shell_cmd": "make config=release"
+				// 	}
+				// },
+				// {
+				// 	"name": " ▶️ Run: 🪲 Debug",
+				// 	"windows": {
+				// 		"shell_cmd": "start .\\scripts\\windows\\run_debug.bat"
+				// 	},
+				// 	"osx": {
+				// 		"shell_cmd": "./bin/Debug/MarkdownParser__Header"
+				// 	},
+				// 	"linux": {
+				// 		"shell_cmd": "./bin/Debug/cp-boii src/file_content_viewer.cpp"
+				// 	}
+				// },
+				// {
+				// 	"name": " ▶️ Run: 🚀 Release",
+				// 	"windows": {
+				// 		"shell_cmd": "start .\\scripts\\windows\\run_release.bat"
+				// 	},
+				// 	"osx": {
+				// 		"shell_cmd": "./bin/Release/MarkdownParser__Header"
+				// 	},
+				// 	"linux": {
+				// 		"shell_cmd": "./scripts/linux/run_release.sh"
+				// 	}
+				// },
+				{
+					"name": "🔥 Build & Run: 🪲 Debug",
+					"windows": {
+						"shell_cmd": "start .\\scripts\\windows\\build_and_run_debug.bat"
+					},
+					"osx": {
+						"shell_cmd": "./bin/Release/MarkdownParser__Header"
+					},
+					"linux": {
+						"shell_cmd": "./scripts/linux/run_release.sh"
+					}
+				},
+				{
+					"name": "🔥 Build & Run: 🚀 Release",
+					"windows": {
+						"shell_cmd": "start .\\scripts\\windows\\build_and_run_release.bat"
+					},
+					"osx": {
+						"shell_cmd": "./bin/Release/MarkdownParser__Header"
+					},
+					"linux": {
+						"shell_cmd": "./scripts/linux/run_release.sh"
+					}
+				},
+				// {
+				// 	"name": "🛠️ Build TestBuilder",
+				// 	"windows": {
+				// 		"shell_cmd": "start .\\scripts\\windows\\build_testbuilder.bat"
+				// 	},
+				// 	"osx": {
+				// 		"shell_cmd": "./scripts/macos/build_testbuilder.sh"
+				// 	},
+				// 	"linux": {
+				// 		"shell_cmd": "./scripts/linux/build_testbuilder.sh"
+				// 	}
+				// },
+				// {
+				// 	"name": "✅ Test",
+				// 	"windows": {
+				// 		"shell_cmd": "start .\\scripts\\windows\\run_tests.bat"
+				// 	},
+				// 	"osx": {
+				// 		"shell_cmd": "./scripts/macos/run_tests.sh"
+				// 	},
+				// 	"linux": {
+				// 		"shell_cmd": "./scripts/linux/run_tests.sh"
+				// 	}
+				// },
+				// {
+				// 	"name": " ▶️ Run: 🧑‍⚕️ Memory Leak Check with Dr.Memory",
+				// 	"windows": {
+				// 		"shell_cmd": "start .\\scripts\\windows\\mem_check_with_dr_memory.bat"
+				// 	},
+				// 	"osx": {
+				// 		"shell_cmd": "valgrind ./bin/Debug/MarkdownParser__Header"
+				// 	},
+				// 	"linux": {
+				// 		"shell_cmd": "valgrind ./bin/Debug/cp-boii src/file_content_viewer.cpp"
+				// 	}
+				// },
+				{
+					"name": "✨ Format code with Clang",
+					"windows": {
+						"shell_cmd": ".\\scripts\\windows\\format_code.bat"
+					},
+					"osx": {
+						"shell_cmd": "./scripts/macos/format_code.sh"
+					},
+					"linux": {
+						"shell_cmd": "./scripts/linux/format_code.sh"
+					}
+				},
+				{
+					"name": "🧹Clean",
+					"windows": {
+						"shell_cmd": ".\\scripts\\windows\\clean.bat"
+					},
+					"osx": {
+						"shell_cmd": "./scripts/macos/clean.sh"
+					},
+					"linux": {
+						"shell_cmd": "./scripts/linux/clean.sh"
+					}
+				}
+			],
+		}
+	]
+}
