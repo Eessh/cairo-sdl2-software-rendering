@@ -1,8 +1,7 @@
 @echo off
 
-echo Cleaning compile commands ...
-del /q compile_commands\*.json >nul 2>&1
-del /q *.json >nul 2>&1
+echo Cleaning distributables ...
+del /q dist\windows\*.exe >nul 2>&1
 
 echo Cleaning executables ...
 del /q bin\Debug\*.exe >nul 2>&1

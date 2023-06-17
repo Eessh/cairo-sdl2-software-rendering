@@ -104,6 +104,18 @@
 						"shell_cmd": "./scripts/linux/run_release.sh"
 					}
 				},
+				{
+					"name": "🥳 Build Distributable",
+					"windows": {
+						"shell_cmd": "start .\\scripts\\windows\\build_distributable.bat"
+					},
+					"osx": {
+						"shell_cmd": "./bin/Release/MarkdownParser__Header"
+					},
+					"linux": {
+						"shell_cmd": "./scripts/linux/run_release.sh"
+					}
+				},
 				// {
 				// 	"name": "🛠️ Build TestBuilder",
 				// 	"windows": {

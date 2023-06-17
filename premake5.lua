@@ -28,7 +28,8 @@ workspace("cairo-sdl2-software-rendering")
 		files({
 			"main.c",
 			"src/*.c",
-			"log-boii/*.c"
+			"log-boii/*.c",
+			"res.res"
 		})
 		filter({ "system:windows" })
 			links({
