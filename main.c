@@ -52,6 +52,76 @@ cairo_surface_t *load_scaled_image(const char *image_file_path,
   return scaled_surface;
 }
 
+unsigned Unicode_CodepointToUTF8(char *utf8, uint32_t codepoint) {
+  if (codepoint <= 0x7F) {
+    utf8[0] = codepoint;
+    return 1;
+  }
+  if (codepoint <= 0x7FF) {
+    utf8[0] = 0xC0 | (codepoint >> 6);
+    utf8[1] = 0x80 | (codepoint & 0x3F);
+    return 2;
+  }
+  if (codepoint <= 0xFFFF) {
+    // detect surrogates
+    if (codepoint >= 0xD800 && codepoint <= 0xDFFF) return 0;
+    utf8[0] = 0xE0 | (codepoint >> 12);
+    utf8[1] = 0x80 | ((codepoint >> 6) & 0x3F);
+    utf8[2] = 0x80 | (codepoint & 0x3F);
+    return 3;
+  }
+  if (codepoint <= 0x10FFFF) {
+    utf8[0] = 0xF0 | (codepoint >> 18);
+    utf8[1] = 0x80 | ((codepoint >> 12) & 0x3F);
+    utf8[2] = 0x80 | ((codepoint >> 6) & 0x3F);
+    utf8[3] = 0x80 | (codepoint & 0x3F);
+    return 4;
+  }
+  return 0;
+}
+
+unsigned utf8_encode(char *utf8, uint32_t codepoint)
+{
+  if (codepoint <= 0x7F) {
+    // Plain ASCII
+    utf8[0] = (char) codepoint;
+    utf8[1] = 0;
+    return 1;
+  }
+  else if (codepoint <= 0x07FF) {
+    // 2-byte unicode
+    utf8[0] = (char) (((codepoint >> 6) & 0x1F) | 0xC0);
+    utf8[1] = (char) (((codepoint >> 0) & 0x3F) | 0x80);
+    utf8[2] = 0;
+    return 2;
+  }
+  else if (codepoint <= 0xFFFF) {
+    // 3-byte unicode
+    utf8[0] = (char) (((codepoint >> 12) & 0x0F) | 0xE0);
+    utf8[1] = (char) (((codepoint >>  6) & 0x3F) | 0x80);
+    utf8[2] = (char) (((codepoint >>  0) & 0x3F) | 0x80);
+    utf8[3] = 0;
+    return 3;
+  }
+  else if (codepoint <= 0x10FFFF) {
+    // 4-byte unicode
+    utf8[0] = (char) (((codepoint >> 18) & 0x07) | 0xF0);
+    utf8[1] = (char) (((codepoint >> 12) & 0x3F) | 0x80);
+    utf8[2] = (char) (((codepoint >>  6) & 0x3F) | 0x80);
+    utf8[3] = (char) (((codepoint >>  0) & 0x3F) | 0x80);
+    utf8[4] = 0;
+    return 4;
+  }
+  else { 
+    // error - use replacement character
+    utf8[0] = (char) 0xEF;  
+    utf8[1] = (char) 0xBF;
+    utf8[2] = (char) 0xBD;
+    utf8[3] = 0;
+    return 0;
+  }
+}
+
 void draw(SDL_Window *window) {
   // White background with SDL2 API
   SDL_FillRect(sdl_surface, NULL, SDL_MapRGB(sdl_surface->format, 16, 16, 16));
@@ -97,7 +167,7 @@ void draw(SDL_Window *window) {
   cairo_text_extents_t text_extents;
   cairo_text_extents(cr, text, &text_extents);
 
-  cairo_select_font_face(cr, "Fantasque Sans Mono", CAIRO_FONT_SLANT_NORMAL,
+  cairo_select_font_face(cr, "JetBrainsMono Nerd Font", CAIRO_FONT_SLANT_NORMAL,
                          CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(cr, 24);
   cairo_move_to(cr, 50, 50);
@@ -114,6 +184,42 @@ void draw(SDL_Window *window) {
 
   if (button)
     button_widget__render(button);
+
+  char unicode_text[4] = "\0\0\0\0";
+  // Unicode_CodepointToUTF8(unicode_text, 58253);
+  utf8_encode(unicode_text, 60199);
+  cairo_move_to(cr, 100, 100);
+  cairo_show_text(cr, unicode_text);
+
+  for (unsigned i=0; i<4; i++)
+    unicode_text[i] = '\0';
+  utf8_encode(unicode_text, 60321);
+  cairo_move_to(cr, 125, 100);
+  cairo_show_text(cr, unicode_text);
+
+  for (unsigned i=0; i<4; i++)
+    unicode_text[i] = '\0';
+  utf8_encode(unicode_text, 60341);
+  cairo_move_to(cr, 150, 100);
+  cairo_show_text(cr, unicode_text);
+
+  for (unsigned i=0; i<4; i++)
+    unicode_text[i] = '\0';
+  utf8_encode(unicode_text, 62227);
+  cairo_move_to(cr, 175, 100);
+  cairo_show_text(cr, unicode_text);
+
+  for (unsigned i=0; i<4; i++)
+    unicode_text[i] = '\0';
+  utf8_encode(unicode_text, 58878);
+  cairo_move_to(cr, 225, 100);
+  cairo_show_text(cr, unicode_text);
+
+  for (unsigned i=0; i<4; i++)
+    unicode_text[i] = '\0';
+  utf8_encode(unicode_text, 58879);
+  cairo_move_to(cr, 200, 100);
+  cairo_show_text(cr, unicode_text);
 
   SDL_BlitSurface(sdl_surface, NULL, SDL_GetWindowSurface(window), NULL);
   SDL_UpdateWindowSurface(window);

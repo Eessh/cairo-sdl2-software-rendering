@@ -182,7 +182,7 @@ result button_widget__render(button_widget *button) {
                                   button->height, button->background_color);
   rocket_render__text(button->x + button->padding_x,
                       button->y + button->padding_y, button->text,
-                      button->foreground_color, "Fantasque Sans Mono", 24,
+                      button->foreground_color, "JetBrainsMono Nerd Font", 24,
                       CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 
   return (result){.ok = true};
