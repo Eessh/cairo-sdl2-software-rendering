@@ -23,7 +23,8 @@ workspace("cairo-sdl2-software-rendering")
 			"include",
 			"log-boii",
 			"SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2",
-			"cairo-windows-1.17.2/include"
+			"cairo-windows-1.17.2/include",
+			"freetype"
 		})
 		files({
 			"main.c",
@@ -36,12 +37,13 @@ workspace("cairo-sdl2-software-rendering")
 				"SDL2main",
 				"SDL2",
 				"cairo",
+				"freetype",
 				"mingw32",
 				"comdlg32",
 				"ole32",
 				"gdi32"
 			})
-			libdirs({ "SDL2-2.26.5/x86_64-w64-mingw32/lib", "cairo-windows-1.17.2/lib/x64" })
+			libdirs({ "SDL2-2.26.5/x86_64-w64-mingw32/lib", "cairo-windows-1.17.2/lib/x64", "freetype/lib/x86_64" })
 		filter({ "system:linux" })
 			links({ "SDL2main", "SDL2", "SDL2_ttf" })
 		filter({ "system:macos" })
