@@ -1,3 +1,5 @@
+#include "SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2/SDL_events.h"
+#include "SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2/SDL_keyboard.h"
 #include "include/button.h"
 #include "include/result.h"
 #include <stdbool.h>
@@ -92,6 +94,46 @@ unsigned utf8_encode(char *utf8, uint32_t codepoint) {
     utf8[2] = (char)0xBD;
     utf8[3] = 0;
     return 0;
+  }
+}
+
+// Took from Lite-XL repository
+// for recording the exact keypresses
+// example: for remapped keys by the user
+static const char *numpad[] = {"end",    "down",  "pagedown", "left",
+                               "",       "right", "home",     "up",
+                               "pageup", "ins",   "delete"};
+
+static const char *get_key_name(const SDL_Event *e, char *buf) {
+  SDL_Scancode scancode = e->key.keysym.scancode;
+  /* Is the scancode from the keypad and the number-lock off?
+  ** We assume that SDL_SCANCODE_KP_1 up to SDL_SCANCODE_KP_9 and
+  *SDL_SCANCODE_KP_0
+  ** and SDL_SCANCODE_KP_PERIOD are declared in SDL2 in that order. */
+  if (scancode >= SDL_SCANCODE_KP_1 && scancode <= SDL_SCANCODE_KP_1 + 10 &&
+      !(e->key.keysym.mod & KMOD_NUM)) {
+    return numpad[scancode - SDL_SCANCODE_KP_1];
+  } else {
+    /* We need to correctly handle non-standard layouts such as dvorak.
+       Therefore, if a Latin letter(code<128) is pressed in the current layout,
+       then we transmit it as it is. But we also need to support shortcuts in
+       other languages, so for non-Latin characters(code>128) we pass the
+       scancode based name that matches the letter in the QWERTY layout.
+
+       In SDL, the codes of all special buttons such as control, shift, arrows
+       and others, are masked with SDLK_SCANCODE_MASK, which moves them outside
+       the unicode range (>0x10FFFF). Users can remap these buttons, so we need
+       to return the correct name, not scancode based. */
+    if ((e->key.keysym.sym < 128) || (e->key.keysym.sym & SDLK_SCANCODE_MASK))
+      strcpy(buf, SDL_GetKeyName(e->key.keysym.sym));
+    else
+      strcpy(buf, SDL_GetScancodeName(scancode));
+    char *temp = buf;
+    while (*temp) {
+      *temp = tolower(*temp);
+      temp++;
+    }
+    return buf;
   }
 }
 
@@ -298,12 +340,13 @@ int main(int argc, char *argv[]) {
     SDL_Event event;
     if (SDL_PollEvent(&event)) {
       switch (event.type) {
-      case SDL_QUIT:
+      case SDL_QUIT: {
         log_info("Quit event occured.");
         done = true;
         free_resources(window);
         return 0;
-      case SDL_WINDOWEVENT:
+      }
+      case SDL_WINDOWEVENT: {
         if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
           log_info("Window resized.");
           cairo_destroy(cr);
@@ -318,6 +361,15 @@ int main(int argc, char *argv[]) {
           redraw = true;
         }
         break;
+      }
+      case SDL_KEYDOWN: {
+        char buf[16];
+        log_info("Key Pressed: %s", get_key_name(&event, buf));
+        // log_info("Key Pressed: scancode: %d, keycode: %s",
+        //          event.key.keysym.scancode,
+        //          SDL_GetKeyName(event.key.keysym.sym));
+        break;
+      }
       default:
         break;
       }
