@@ -141,9 +141,6 @@ void draw(SDL_Window *window) {
   // White background with SDL2 API
   SDL_FillRect(sdl_surface, NULL, SDL_MapRGB(sdl_surface->format, 16, 16, 16));
 
-  // rocket_render__rectangle_filled(0, 0, sdl_surface->w, sdl_surface->h,
-  //                                 (SDL_Color){255, 255, 255, 255});
-
   rocket_render__rectangle_rounded(20, 20, 8, 100, 4,
                                    (SDL_Color){255, 0, 0, 164});
 
@@ -215,7 +212,6 @@ void draw(SDL_Window *window) {
     button_widget__render(button);
 
   char unicode_text[4] = "\0\0\0\0";
-  // Unicode_CodepointToUTF8(unicode_text, 58253);
   utf8_encode(unicode_text, 60199);
   cairo_move_to(cr, 100, 100);
   cairo_show_text(cr, unicode_text);
@@ -240,14 +236,14 @@ void draw(SDL_Window *window) {
 
   for (unsigned i = 0; i < 4; i++)
     unicode_text[i] = '\0';
-  utf8_encode(unicode_text, 58878);
-  cairo_move_to(cr, 225, 100);
+  utf8_encode(unicode_text, 58879);
+  cairo_move_to(cr, 200, 100);
   cairo_show_text(cr, unicode_text);
 
   for (unsigned i = 0; i < 4; i++)
     unicode_text[i] = '\0';
-  utf8_encode(unicode_text, 58879);
-  cairo_move_to(cr, 200, 100);
+  utf8_encode(unicode_text, 58878);
+  cairo_move_to(cr, 225, 100);
   cairo_show_text(cr, unicode_text);
 
   SDL_BlitSurface(sdl_surface, NULL, SDL_GetWindowSurface(window), NULL);
@@ -365,9 +361,6 @@ int main(int argc, char *argv[]) {
       case SDL_KEYDOWN: {
         char buf[16];
         log_info("Key Pressed: %s", get_key_name(&event, buf));
-        // log_info("Key Pressed: scancode: %d, keycode: %s",
-        //          event.key.keysym.scancode,
-        //          SDL_GetKeyName(event.key.keysym.sym));
         break;
       }
       default:
