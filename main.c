@@ -3,6 +3,7 @@
 #include <string.h>
 #include "SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2/SDL_events.h"
 #include "SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2/SDL_keyboard.h"
+#include "SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2/SDL_video.h"
 #include "include/button.h"
 #include "include/result.h"
 #define SDL_MAIN_HANDLED
@@ -353,6 +354,9 @@ int main(int argc, char* argv[])
     480,
     SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
+  // setting window opacity (crazy stuff)
+  // SDL_SetWindowOpacity(window, 0.5f);
+
   // Setting window icon
   SDL_Surface* rocket_icon = SDL_LoadBMP("assets/images/rocket.bmp");
   if(!rocket_icon)
@@ -484,9 +488,17 @@ int main(int argc, char* argv[])
 
         if(mod_key_active() && !mod_pressed)
         {
-          char mod_buf[16];
+          char mod_buf[16] = "\0";
           get_mod_keys_string(mod_buf);
-          log_info("Key Binding: %s+%s", mod_buf, buf);
+          if(strcmp("ctrl", mod_buf) == 0 && strcmp("t", buf) == 0)
+          {
+            log_info("Key Binding: %s+%s", mod_buf, buf);
+            if(SDL_IsTextInputActive())
+            {
+              SDL_StopTextInput();
+            }
+            SDL_StartTextInput();
+          }
         }
         break;
       }
@@ -503,6 +515,10 @@ int main(int argc, char* argv[])
         {
           mod_states[1].pressed = false;
         }
+        break;
+      }
+      case SDL_TEXTINPUT: {
+        // log_debug("Text inserted: %s", event.text.text);
         break;
       }
       default:
