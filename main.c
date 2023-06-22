@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2/SDL_events.h"
 #include "SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2/SDL_keyboard.h"
@@ -166,7 +167,7 @@ static const char* get_key_name(const SDL_Event* e, char* buf)
   }
 }
 
-// Key Bindings
+// Mod Keys
 typedef enum mod_key
 {
   CTRL,
@@ -179,7 +180,21 @@ typedef struct mod_key_state
   bool pressed;
 } mod_key_state;
 
-mod_key_state mod_states[] = {{CTRL, false}, {SHIFT, false}};
+static mod_key_state mod_states[] = {{CTRL, false}, {SHIFT, false}};
+
+// Key Binding
+typedef struct key_binding
+{
+  char* mod_keys_string;
+  char* key_string;
+  bool (*callback)(SDL_Event);
+} key_binding;
+
+key_binding* key_binding_new(const char* mod_keys_string,
+                             const char* key_string,
+                             bool (*callback)(SDL_Event));
+bool key_binding_process(const key_binding* binding, SDL_Event event);
+void key_binding_free(key_binding* binding);
 
 const char* mod_key_to_string(const mod_key key)
 {
@@ -339,6 +354,17 @@ void draw(SDL_Window* window)
   SDL_UpdateWindowSurface(window);
 }
 
+bool key_binding_callback(SDL_Event event)
+{
+  if(!SDL_IsTextInputActive())
+  {
+    SDL_StartTextInput();
+    return true;
+  }
+  SDL_StopTextInput();
+  return true;
+}
+
 int main(int argc, char* argv[])
 {
   SDL_Init(SDL_INIT_VIDEO);
@@ -434,6 +460,8 @@ int main(int argc, char* argv[])
   bool done = false, redraw = true;
   unsigned int wait_time = 500;
 
+  key_binding* binding = key_binding_new("ctrl", "t", key_binding_callback);
+
   while(!done)
   {
     double frame_start_time =
@@ -470,41 +498,12 @@ int main(int argc, char* argv[])
         break;
       }
       case SDL_KEYDOWN: {
-        char buf[16];
-        log_info("Key Pressed: %s", get_key_name(&event, buf));
-
-        bool mod_pressed = false;
-        if(strcmp("left ctrl", buf) == 0 || strcmp("right ctrl", buf) == 0)
-        {
-          mod_pressed = true;
-          mod_states[0].pressed = true;
-        }
-        else if(strcmp("left shift", buf) == 0 ||
-                strcmp("right shift", buf) == 0)
-        {
-          mod_pressed = true;
-          mod_states[1].pressed = true;
-        }
-
-        if(mod_key_active() && !mod_pressed)
-        {
-          char mod_buf[16] = "\0";
-          get_mod_keys_string(mod_buf);
-          if(strcmp("ctrl", mod_buf) == 0 && strcmp("t", buf) == 0)
-          {
-            log_info("Key Binding: %s+%s", mod_buf, buf);
-            if(SDL_IsTextInputActive())
-            {
-              SDL_StopTextInput();
-            }
-            SDL_StartTextInput();
-          }
-        }
+        key_binding_process(binding, event);
         break;
       }
       case SDL_KEYUP: {
         char buf[16];
-        log_info("Key Released: %s", get_key_name(&event, buf));
+        // log_info("Key Released: %s", get_key_name(&event, buf));
 
         if(strcmp("left ctrl", buf) == 0 || strcmp("right ctrl", buf) == 0)
         {
@@ -576,4 +575,85 @@ void free_resources(SDL_Window* window)
   SDL_DestroyWindow(window);
 
   SDL_Quit();
+}
+
+key_binding* key_binding_new(const char* mod_keys_string,
+                             const char* key_string,
+                             bool (*callback)(SDL_Event))
+{
+  if(!mod_keys_string)
+  {
+    return NULL;
+  }
+
+  if(!key_string)
+  {
+    return NULL;
+  }
+
+  if(!callback)
+  {
+    return NULL;
+  }
+
+  key_binding* binding = (key_binding*)calloc(1, sizeof(key_binding));
+  if(!binding)
+  {
+    return NULL;
+  }
+
+  binding->mod_keys_string = strdup(mod_keys_string);
+  binding->key_string = strdup(key_string);
+  binding->callback = callback;
+
+  return binding;
+}
+
+bool key_binding_process(const key_binding* binding, SDL_Event event)
+{
+  if(!binding)
+  {
+    return false;
+  }
+
+  char buf[16];
+  log_info("Key Pressed: %s", get_key_name(&event, buf));
+
+  bool mod_pressed = false;
+  if(strcmp("left ctrl", buf) == 0 || strcmp("right ctrl", buf) == 0)
+  {
+    mod_pressed = true;
+    mod_states[0].pressed = true;
+  }
+  else if(strcmp("left shift", buf) == 0 || strcmp("right shift", buf) == 0)
+  {
+    mod_pressed = true;
+    mod_states[1].pressed = true;
+  }
+
+  if(mod_key_active() && !mod_pressed)
+  {
+    char mod_buf[16] = "\0";
+    get_mod_keys_string(mod_buf);
+    if(strcmp(binding->mod_keys_string, mod_buf) == 0 &&
+       strcmp(binding->key_string, buf) == 0)
+    {
+      log_info("Key Binding: %s+%s", mod_buf, buf);
+      return binding->callback(event);
+    }
+  }
+
+  return false;
+}
+
+void key_binding_free(key_binding* binding)
+{
+  if(!binding)
+  {
+    return;
+  }
+
+  free(binding->mod_keys_string);
+  free(binding->key_string);
+  free(binding);
 }
