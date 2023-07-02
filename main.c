@@ -436,6 +436,7 @@ int main(int argc, char* argv[])
   cairo_surface_set_device_scale(cr_surface, 1, 1);
 
   cr = cairo_create(cr_surface);
+  cairo_surface_destroy(cr_surface);
   //
   // printf("sdl_surface->w=%d\n"
   //        "sdl_surface->h=%d\n"
@@ -482,7 +483,7 @@ int main(int argc, char* argv[])
         {
           log_info("Window resized.");
           cairo_destroy(cr);
-          cairo_surface_destroy(cr_surface);
+          // cairo_surface_destroy(cr_surface);
           sdl_surface = SDL_GetWindowSurface(window);
           cr_surface = cairo_image_surface_create_for_data(
             (unsigned char*)sdl_surface->pixels,
@@ -492,6 +493,7 @@ int main(int argc, char* argv[])
             sdl_surface->pitch);
           cairo_surface_set_device_scale(cr_surface, 1, 1);
           cr = cairo_create(cr_surface);
+          cairo_surface_destroy(cr_surface);
           log_debug("New dimensions: (%d, %d)", sdl_surface->w, sdl_surface->h);
           redraw = true;
         }
@@ -570,7 +572,7 @@ void free_resources(SDL_Window* window)
   button_widget__free(button);
 
   cairo_destroy(cr);
-  cairo_surface_destroy(cr_surface);
+  // cairo_surface_destroy(cr_surface);
 
   SDL_DestroyWindow(window);
 
